@@ -141,6 +141,8 @@ DESIRED_VELOCITY_RAM                 = 72
 BYTE1 = 0x01
 BYTE2 = 0x02
 
+BROADCAST_ID = 0xFE
+
 
 
 #connect  serial port
@@ -287,4 +289,15 @@ def get_servo_temperature(servoid):
     except:
         print "Could not read from the servos. Check connection"
     return ord(rxdata[9])
+
+def clear_errors():
+    data = []
+    data.append(0x0B)
+    data.append(BROADCAST_ID)
+    data.append(RAM_WRITE_REQ)
+    data.append(STATUS_ERROR_RAM)
+    data.append(BYTE2)
+    data.append(0x00)
+    data.append(0x00)
+    send_data(data)
 
