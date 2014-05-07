@@ -270,6 +270,21 @@ def get_servo_position(servoid):
     try:
         rxdata = serport.read(13)
     except:
-        print "could not read from the servos. Check connection"
+        print "Could not read from the servos. Check connection"
     return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
+
+def get_servo_temperature(servoid):
+    data = []
+    data.append(0x09)
+    data.append(servoid)
+    data.append(RAM_READ_REQ)
+    data.append(TEMPERATURE_RAM)
+    data.append(BYTE2)
+    send_data(data)
+    rxdata = []
+    try:
+        rxdata = serport.read(13)
+    except:
+        print "Could not read from the servos. Check connection"
+    return ord(rxdata[9])
 
