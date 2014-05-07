@@ -181,8 +181,10 @@ def senddata(data):
     for i in range(len(data)):
         byteformat = '%02X' % data[i]
         stringtosend = stringtosend + "\\x" + byteformat
-    serport.write(stringtosend.decode('string-escape'))
-
+    try:
+        serport.write(stringtosend.decode('string-escape'))
+    except:
+        print "could not write to serial port"
 
 
 #set LED color  0x00-Off, 0x01-GREEN, 0x02-BLUE, 0x03-CYAN, 0x04-RED, 0x05- green-orange ,0x06-Violet, 0x07 ALL
