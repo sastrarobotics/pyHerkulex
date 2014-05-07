@@ -167,11 +167,68 @@ def checksum1(data,stringlength):
 def checksum2(data):
     return (~data)&0xFE
 
+
+#packetize the data & send to serial port
 def senddata(data):
     datalength = len(data)
     csm1 = checksum1(data,datalength)
     csm2 = checksum2(csm1)
-    
+    data.insert(0,0xFF)
+    data.insert(1,0xFF)
+    data.insert(5,csm1)
+    data.insert(6,csm2)
+    stringtosend = ""
+    for i in range(len(data)):
+        byteformat = '%02X' % data[i]
+        stringtosend = stringtosend + "\\x" + byteformat
+    serport.write(stringtosend.decode('string-escape'))
+
+
+
+#set LED color  0x00-Off, 0x01-GREEN, 0x02-BLUE, 0x03-CYAN, 0x04-RED, 0x05- green-orange ,0x06-Violet, 0x07 ALL
+def  setled(servoid,colorcode):
+    data = []
+    data.append(0x0A)
+    data.append(servoid)
+    data.append(RAM_WRITE_REQ)
+    data.append(LED_CONTROL_RAM)
+    data.append(0x01)
+    data.append(colorcode)
+    senddata(data)
+	
+
+def brakeon(servoid):
+    data = []
+    data.append(0x0A)
+    data.append(servoid)
+    data.append(RAM_WRITE_REQ)
+    data.append(TORQUE_CONTROL_RAM)
+    data.append(0x01)
+    data.append(0x40)
+    senddata(data)
+
+
+def torqueoff(servoid):
+    data = []
+    data.append(0x0A)
+    data.append(servoid)
+    data.append(RAM_WRITE_REQ)
+    data.append(TORQUE_CONTROL_RAM)
+    data.append(0x01)
+    data.append(0x00)
+    senddata(data)
+
+
+
+def torqueon(servoid):
+    data = []
+    data.append(0x0A)
+    data.append(servoid)
+    data.append(RAM_WRITE_REQ)
+    data.append(TORQUE_CONTROL_RAM)
+    data.append(0x01)
+    data.append(0x60)
+    senddata(data)
 
 
     
