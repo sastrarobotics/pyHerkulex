@@ -138,6 +138,10 @@ ABSOLUTE_GOAL_POSITION_RAM           = 68
 ABSOLUTE_DESIRED_TRAJECTORY_POSITION = 70
 DESIRED_VELOCITY_RAM                 = 72
 
+BYTE1 = 0x01
+BYTE2 = 0x02
+
+
 
 #connect  serial port
 def connect(portname,baudrate):
@@ -159,7 +163,7 @@ def close():
 #checksum 1 function
 def checksum1(data,stringlength):
     buffer = 0
-    for x in range(0, stringlength)
+    for x in range(0, stringlength):
         buffer = buffer ^ data[x]
         
     return buffer&0xFE;
@@ -169,7 +173,7 @@ def checksum2(data):
 
 
 #packetize the data & send to serial port
-def senddata(data):
+def send_data(data):
     datalength = len(data)
     csm1 = checksum1(data,datalength)
     csm2 = checksum2(csm1)
@@ -188,7 +192,7 @@ def senddata(data):
 
 
 #set LED color  0x00-Off, 0x01-GREEN, 0x02-BLUE, 0x03-CYAN, 0x04-RED, 0x05- green-orange ,0x06-Violet, 0x07 ALL
-def  setled(servoid,colorcode):
+def  set_led(servoid,colorcode):
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -196,10 +200,10 @@ def  setled(servoid,colorcode):
     data.append(LED_CONTROL_RAM)
     data.append(0x01)
     data.append(colorcode)
-    senddata(data)
+    send_data(data)
 	
-
-def brakeon(servoid):
+#set the brake of the servos specified by servoid
+def brake_on(servoid):
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -207,10 +211,10 @@ def brakeon(servoid):
     data.append(TORQUE_CONTROL_RAM)
     data.append(0x01)
     data.append(0x40)
-    senddata(data)
+    send_data(data)
 
-
-def torqueoff(servoid):
+#set the torque to zero of the servos specified by servoid
+def torque_off(servoid):
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -218,11 +222,11 @@ def torqueoff(servoid):
     data.append(TORQUE_CONTROL_RAM)
     data.append(0x01)
     data.append(0x00)
-    senddata(data)
+    send_data(data)
 
 
-
-def torqueon(servoid):
+#activates the torque of the servos specified by servoid
+def torque_on(servoid):
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -230,7 +234,42 @@ def torqueon(servoid):
     data.append(TORQUE_CONTROL_RAM)
     data.append(0x01)
     data.append(0x60)
-    senddata(data)
+    send_data(data)
+
+# set the servo position. moves from current position to 
+# goalposition in time goaltime. LED options are:
+# 0x00 LED off
+# 0x04 GREEN
+# 0x08 BLUE
+# 0x10 RED
+def set_servo_position(servoid,goalposition,goaltime,led):
+    goalposition_msb = int(goalposition) >> 8
+    goalposition_lsb = int(goalposition) & 0xff
+
+    data = []
+    data.append(0x0C)
+    data.append(servoid)
+    data.append(I_JOG_REQ)
+    data.append(goalposition_lsb)
+    data.append(goalposition_msb)
+    data.append(led)
+    data.append(servoid)
+    data.append(goaltime)
+    send_data(data)
 
 
-    
+def get_servo_position(servoid):   
+    data = []
+    data.append(0x09)
+    data.append(servoid)
+    data.append(RAM_READ_REQ)
+    data.append(CALIBRATED_POSITION_RAM)
+    data.append(BYTE2)
+    send_data(data)
+    rxdata = []
+    try:
+        rxdata = serport.read(13)
+    except:
+        print "could not read from the servos. Check connection"
+    return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
+
