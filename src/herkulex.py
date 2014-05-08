@@ -301,3 +301,21 @@ def clear_errors():
     data.append(0x00)
     send_data(data)
 
+def get_servo_torque(servoid):
+    data = []
+    data.append(0x09)
+    data.append(servoid)
+    data.append(RAM_READ_REQ)
+    data.append(PWM_RAM)
+    data.append(BYTE2)
+    send_data(data)
+    rxdata = []
+    try:
+        rxdata = serport.read(13)
+    except:
+        print "Could not read from the servos. Please check the connections"
+    if(ord(rxdata[10])<=127):
+        return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
+    else:
+        return (ord(rxdata[10])-255)*255 + (ord(rxdata[9])&0xFF)-255
+
