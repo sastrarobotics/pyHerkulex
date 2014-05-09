@@ -318,7 +318,7 @@ def get_servo_torque(servoid):
         return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
     else:
         return (ord(rxdata[10])-0xFF)*0xFF + (ord(rxdata[9])&0xFF)-0xFF
-
+# 0x04 green, 0x08 blue, 0x10 red
 def set_servo_speed(servoid,goalspeed,led):
     if(goalspeed>0):
         goalspeed_msb = (int(goalspeed)& 0xFF00) >> 8
@@ -334,7 +334,7 @@ def set_servo_speed(servoid,goalspeed,led):
     data.append(I_JOG_REQ)
     data.append(goalspeed_lsb)
     data.append(goalspeed_msb)
-    data.append(0x0A)
+    data.append(0x02|led)
     data.append(servoid)
     data.append(0x00)    
     send_data(data)
