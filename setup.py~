@@ -2,12 +2,12 @@ from distutils.core import setup
 setup(
 name = 'pyherkulex',
 packages = ['pyherkulex'],
-version = '0.22',
+version = '0.21',
 description = 'Dongbu Herkulex Smart servo interface library',
 author = 'Achu Wilson',
 author_email = 'achuwilson@gmail.com',
 url = 'https://github.com/sastrarobotics/pyHerkulex',
-download_url = 'https://github.com/sastrarobotics/pyHerkulex/tarball/0.22',
+download_url = 'https://github.com/sastrarobotics/pyHerkulex/tarball/0.21',
 keywords = ['HerKulex', 'Dongbu', 'Smart Servo','Sastra Robotics'],
 classifiers = []
 )
