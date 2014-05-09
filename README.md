@@ -1,4 +1,5 @@
-pyHerkulex
-==========
 
-Python library for Dongbu Herkulex Smart Servos
+pyHerkulex
+
+
+ A Python library for Herkulex servos
