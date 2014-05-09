@@ -1,6 +1,11 @@
 #!/usr/bin/env python2.7
 
 """
+@package: pyHerkulex
+@name: herkulex.py
+@author: Achu Wilson (achuwilson@gmail.com)
+@version: 0.1
+
 This is a python library for interfacing the Herkulex range of smart 
 servo motors manufactured by Dongbu Robotics.
 
@@ -12,6 +17,7 @@ See http://www.gnu.org/licenses/gpl.html for details.
 
 For usage of this code for  commercial purposes contact Sastra Robotics 
 India Pvt. Ltd. (mailto:contact@sastrarobotics.com)
+
 
 """ 
 import os
@@ -145,8 +151,18 @@ BROADCAST_ID = 0xFE
 
 
 
-#connect  serial port
 def connect(portname,baudrate):
+    """ Connect to the Herkulex bus
+
+    Connect to serial port to which Herkulex Servos are attatched
+
+    Args:
+        portname (str): The serial port name
+        baudrate (int): The serial port baudrate 
+  
+    Raises:
+        SerialException: Error occured while opening serial port
+    """
     global serport
     try:
         serport = serial.Serial(portname, baudrate)
@@ -154,28 +170,60 @@ def connect(portname,baudrate):
     except:
         print " check serial port & permissions"
 
-#properly close a serial port
 def close():
+    """ Close the Serial port
+ 
+    Properly close the serial port before exiting the application
+
+    Raises:
+        SerialException: Error occured while opening serial port
+    """   
     global serport
     try:
         serport.close()
     except:
         print " Error!.. Failed closing serial port"
 
-#checksum 1 function
+
 def checksum1(data,stringlength):
+    """ Calculate Checksum 1
+
+    Args:
+        data (list): the data of which checksum is to be calculated
+        stringlength (int): the length of the data
+    
+    Returns:
+        int:  The calculated checksum 1
+    """ 
     buffer = 0
     for x in range(0, stringlength):
-        buffer = buffer ^ data[x]
-        
+        buffer = buffer ^ data[x]  
     return buffer&0xFE;
 
 def checksum2(data):
+    """ Calculate Checksum 2
+
+    Args:
+        data (int): the data of which checksum is to be calculated
+            
+    Returns:
+        int:  The calculated checksum 2
+    """ 
     return (~data)&0xFE
 
 
-#packetize the data & send to serial port
+
 def send_data(data):
+    """ Send data to herkulex
+ 
+    Paketize & write the packet to serial port
+
+    Args:
+        data (list): the data to be sent
+
+    Raises:
+        SerialException: Error occured while opening serial port
+    """   
     datalength = len(data)
     csm1 = checksum1(data,datalength)
     csm2 = checksum2(csm1)
@@ -193,8 +241,20 @@ def send_data(data):
         print "could not write to serial port"
 
 
-#set LED color  0x00-Off, 0x01-GREEN, 0x02-BLUE, 0x03-CYAN, 0x04-RED, 0x05- green-orange ,0x06-Violet, 0x07 ALL
 def  set_led(servoid,colorcode):
+    """ Set the LED Color of Herkulex
+
+    Args:
+        servoid (int): The id of the servo
+        colorcode (int): The code for colors
+                        (0x00-OFF
+                         0x02-BLUE
+                         0x03-CYAN
+                         0x04-RED
+                         0x05-ORANGE
+                         0x06-VIOLET
+                         0x07-WHITE
+    """
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -204,8 +264,16 @@ def  set_led(servoid,colorcode):
     data.append(colorcode)
     send_data(data)
 	
-#set the brake of the servos specified by servoid
+
 def brake_on(servoid):
+    """ Set the Brakes of Herkulex
+
+    In braked mode, position control and velocity control
+    will not work, enable torque before that
+
+    Args:
+        servoid (int): The id of the servo
+    """
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -215,8 +283,17 @@ def brake_on(servoid):
     data.append(0x40)
     send_data(data)
 
-#set the torque to zero of the servos specified by servoid
+
 def torque_off(servoid):
+    """ Set the torques of Herkulex to zero
+
+    In this mode, position control and velocity control
+    will not work, enable torque before that. Also the 
+    servo shaft is freely movable
+
+    Args:
+        servoid (int): The id of the servo
+    """
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -227,8 +304,16 @@ def torque_off(servoid):
     send_data(data)
 
 
-#activates the torque of the servos specified by servoid
+
 def torque_on(servoid):
+    """ Enable the torques of Herkulex
+
+    In this mode, position control and velocity control
+    will work.
+
+    Args:
+        servoid (int): The id of the servo
+    """
     data = []
     data.append(0x0A)
     data.append(servoid)
@@ -238,13 +323,22 @@ def torque_on(servoid):
     data.append(0x60)
     send_data(data)
 
-# set the servo position. moves from current position to 
-# goalposition in time goaltime. LED options are:
-# 0x00 LED off
-# 0x04 GREEN
-# 0x08 BLUE
-# 0x10 RED
+
 def set_servo_position(servoid,goalposition,goaltime,led):
+    """ Set the position of Herkulex
+
+    Enable torque using torque_on function before calling this
+
+    Args:
+        servoid (int): The id of the servo
+        goalposition (int): The desired position, min-0 & max-1023
+        goaltime (int): the time taken to move from present position to goalposition
+        led (int): the LED color
+                   0x00 LED off
+                   0x04 GREEN
+                   0x08 BLUE
+                   0x10 RED
+    """
     goalposition_msb = int(goalposition) >> 8
     goalposition_lsb = int(goalposition) & 0xff
 
@@ -260,7 +354,19 @@ def set_servo_position(servoid,goalposition,goaltime,led):
     send_data(data)
 
 
-def get_servo_position(servoid):   
+def get_servo_position(servoid):
+    """ Gets the current position of Herkulex
+
+    Args:
+        servoid (int): The id of the servo
+
+    Returns:
+        int: position of the servo- 0 to 1023
+
+    Raises:
+        SerialException: Error occured while opening serial port
+      
+    """
     data = []
     data.append(0x09)
     data.append(servoid)
@@ -276,6 +382,18 @@ def get_servo_position(servoid):
     return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
 
 def get_servo_temperature(servoid):
+    """ Gets the current temperature of Herkulex
+
+    Args:
+        servoid (int): The id of the servo
+
+    Returns:
+        int: the current temperature register of Herkulex
+
+    Raises:
+        SerialException: Error occured while opening serial port
+      
+    """
     data = []
     data.append(0x09)
     data.append(servoid)
@@ -291,6 +409,12 @@ def get_servo_temperature(servoid):
     return ord(rxdata[9])
 
 def clear_errors():
+    """ Clears the errors register of Herkulex
+
+    Args:
+        servoid (int): The id of the servo
+      
+    """
     data = []
     data.append(0x0B)
     data.append(BROADCAST_ID)
@@ -302,6 +426,21 @@ def clear_errors():
     send_data(data)
 
 def get_servo_torque(servoid):
+    """ Gets the current torque of Herkulex
+
+    Gives the current load on the servo shaft.
+    It is actually the PWM value to the motors
+
+    Args:
+        servoid (int): The id of the servo
+
+    Returns:
+        int: the torque on servo shaft. range from -1023 to 1023
+
+    Raises:
+        SerialException: Error occured while opening serial port
+      
+    """
     data = []
     data.append(0x09)
     data.append(servoid)
@@ -318,8 +457,22 @@ def get_servo_torque(servoid):
         return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
     else:
         return (ord(rxdata[10])-0xFF)*0xFF + (ord(rxdata[9])&0xFF)-0xFF
-# 0x04 green, 0x08 blue, 0x10 red
+
+
+
 def set_servo_speed(servoid,goalspeed,led):
+    """ Set the Herkulex in continuous rotation mode
+
+    Args:
+        servoid (int): The id of the servo
+        goalspeed (int): the speed , range -1023 to 1023
+        led (int): the LED color
+                   0x00 LED off
+                   0x04 GREEN
+                   0x08 BLUE
+                   0x10 RED
+        
+    """
     if(goalspeed>0):
         goalspeed_msb = (int(goalspeed)& 0xFF00) >> 8
         goalspeed_lsb = int(goalspeed) & 0xff
