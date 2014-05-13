@@ -492,4 +492,23 @@ def set_servo_speed(servoid,goalspeed,led):
     data.append(0x00)    
     send_data(data)
 
+def set_position_p(servoid,pvalue):
+    """ Set the P gain of the PID
+
+    Args:
+        servoid (int) : The id of the servo
+        pvalue (int): P value 
+    """
+    pvalue_msb = int(pvalue) >> 8
+    pvalue_lsb = int(pvalue) & 0xff
+
+    data = []
+    data.append(0x0B)
+    data.append(servoid)
+    data.append(RAM_WRITE_REQ)
+    data.append(POSITION_KP_RAM)
+    data.append(BYTE2)
+    data.append( pvalue_lsb)
+    data.append( pvalue_lsb)
+    send_data(data)
 
