@@ -532,4 +532,25 @@ def set_position_i(servoid,ivalue):
     data.append(ivalue_lsb)
     send_data(data)
 
+def set_position_d(servoid,dvalue):
+    """ Set the D gain of the PID
+
+    Args:
+        servoid (int) : The id of the servo
+        dvalue (int): D value 
+    """
+    dvalue_msb = int(dvalue) >> 8
+    dvalue_lsb = int(dvalue) & 0xff
+
+    data = []
+    data.append(0x0B)
+    data.append(servoid)
+    data.append(RAM_WRITE_REQ)
+    data.append(POSITION_KD_RAM)
+    data.append(BYTE2)
+    data.append(dvalue_lsb)
+    data.append(dvalue_lsb)
+    send_data(data)
+
+
 
