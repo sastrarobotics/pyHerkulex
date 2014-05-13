@@ -671,3 +671,44 @@ def save_pid_eeprom(servoid):
     data_d.append( dvalue_msb)
     send_data(data_d)
 
+def scale(input_value, input_min, input_max, out_min, out_max):
+    # Figure out how 'wide' each range is
+    input_Span = input_max - input_min
+    output_Span = out_max - out_min
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(input_value - input_min) / float(input_Span)
+    # Convert the 0-1 range into a value in the right range.
+    return out_min + (valueScaled * output_Span)
+
+
+
+def set_servo_angle(servoid,goalangle,goaltime,led):
+    """ Sets the servo angle (in degrees) 
+
+    Enable torque using torque_on function before calling this
+
+    Args:
+        servoid (int): The id of the servo
+        goalangle (int): The desired angle in degrees, range -150 to 150
+        goaltime (int): the time taken to move from present position to goalposition
+        led (int): the LED color
+                   0x00 LED off
+                   0x04 GREEN
+                   0x08 BLUE
+                   0x10 RED
+    """
+
+    goalposition = scale(goalangle,-150,150,21,1002)
+    set_servo_position(servoid,goalposition,goaltime,led)
+
+def get_servo_angle(servoid):
+    """ Gets the current angle of the servo in degrees
+
+    Args:
+        servoid (int) : id of the servo
+    """
+    servoposition =  get_servo_position(servoid)
+    return scale(servoposition,21,1002,-150,150)
+
+
+
