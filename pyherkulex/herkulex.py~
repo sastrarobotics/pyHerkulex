@@ -622,7 +622,7 @@ def get_position_d(servoid):
 def save_pid_eeprom(servoid):
     """ saves the PID values from RAM to EEPROM
 
-    Args:
+    ARGS:
         servoid (int): id of the servo
     """
     p = get_position_p(servoid)	

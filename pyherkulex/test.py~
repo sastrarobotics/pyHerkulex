@@ -1,0 +1,34 @@
+import herkulex
+import time
+
+herkulex.connect("/dev/ttyUSB0",115200)
+#herkulex.set_led(253,0x01)
+herkulex.torque_on(253)
+herkulex.clear_errors()
+print herKulex.get_position_p(253)
+herkulex.set_servo_position(253,500,2,0x08)
+#herkulex.set_servo_speed(253,200,0x08)
+#herkulex.torque_on(253)
+time.sleep(2)
+
+herkulex.set_servo_position(253,120,2,0x08)
+time.sleep(2)
+herkulex.set_servo_position(253,800,2,0x08)
+time.sleep(2)
+herkulex.set_position_p(253,800)
+herkulex.set_servo_position(253,500,2,0x08)
+#herkulex.set_servo_speed(253,200,0x08)
+#herkulex.torque_on(253)
+time.sleep(2)
+print herKulex.get_position_p(253)
+
+herkulex.set_servo_position(253,120,2,0x08)
+time.sleep(2)
+herkulex.set_servo_position(253,800,2,0x08)
+time.sleep(2)
+
+
+#while(1):
+    #print herkulex.get_servo_position(253)
+    #print herkulex.get_servo_temperature(253)
+#    print herkulex.get_servo_torque(253)
