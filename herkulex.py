@@ -3,7 +3,7 @@
 """
 @package: pyHerkulex
 @name: herkulex.py
-@author: Achu Wilson (achuwilson@gmail.com)
+@author: Achu Wilson (achuwilson@gmail.com), Akhil Chandran  (akhilchandran.t.r@gmail.com)
 @version: 0.1
 
 This is a python library for interfacing the Herkulex range of smart 
