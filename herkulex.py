@@ -165,7 +165,7 @@ def connect(portname,baudrate):
     """
     global serport
     try:
-        serport = serial.Serial(portname, baudrate)
+        serport = serial.Serial(portname, baudrate, timeout = 0.1)
 
     except:
         print " check serial port & permissions"
@@ -269,32 +269,36 @@ def scale(input_value, input_min, input_max, out_min, out_max):
     # Convert the 0-1 range into a value in the right range.
     return out_min + (valueScaled * output_Span)
    
-
+def scan_servos():
+     # Figure out sevoides connected
+     servos = []
+     for id in range(0x00,0xFE):
+         model = get_model(id)
+         if model:
+             servos += [(id, model)]
+     return servos      
+     
+     
+def get_model(servoid):
+    data = []
+    data.append(0x09)
+    data.append(servoid)
+    data.append(EEP_READ_REQ)
+    data.append(MODEL_NO1_EEP)
+    data.append(BYTE1)
+    send_data(data)
+    rxdata = []
+    try:
+        rxdata = serport.read(12)
+        return (ord(rxdata[9])&0xFF)
+    except:
+        pass
+     
 class servo:
 
    def __init__(self,servoid):
        self.servoid = servoid
-
-       self.servomodel = self.get_model()
-
-
-
-   def get_model(self):
-       data = []
-       data.append(0x09)
-       data.append(self.servoid)
-       data.append(EEP_READ_REQ)
-       data.append(MODEL_NO1_EEP)
-       data.append(BYTE1)
-       
-       send_data(data)
-       
-       rxdata = []
-       try:
-           rxdata = serport.read(12)
-       except:
-           print "Could not read from the servos. Check connection"
-       return (ord(rxdata[9])&0xFF)
+       self.servomodel = get_model(servoid)
       
    def  set_led(self,colorcode):
        """ Set the LED Color of Herkulex
@@ -318,8 +322,7 @@ class servo:
        data.append(0x01)
        data.append(colorcode)
        send_data(data)
-   	
-   
+       
    def brake_on(self):
        """ Set the Brakes of Herkulex
    
@@ -753,6 +756,3 @@ class servo:
            return scale(servoposition,10627,22129,-159.9,159.6)
        else:
            return scale(servoposition,21,1002,-150,150)
-   
-   
-   
