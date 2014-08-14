@@ -292,9 +292,10 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(12)
+           return (ord(rxdata[9])&0xFF)
        except:
            print "Could not read from the servos. Check connection"
-       return (ord(rxdata[9])&0xFF)
+       
       
    def  set_led(self,colorcode):
        """ Set the LED Color of Herkulex
@@ -433,12 +434,13 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(13)
+           if (self.servomodel==0x06 or self.servomodel == 0x04):
+               return ((ord(rxdata[10])&0xff)<<8) | (ord(rxdata[9])&0xFF)
+           else:
+               return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF)
+
        except:
            print "Could not read from the servos. Check connection"
-       if (self.servomodel==0x06 or self.servomodel == 0x04):
-           return ((ord(rxdata[10])&0xff)<<8) | (ord(rxdata[9])&0xFF)
-       else:
-           return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF)
            
    
    def get_servo_temperature(self):
@@ -464,9 +466,10 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(13)
+           return ord(rxdata[9])
        except:
            print "Could not read from the servos. Check connection"
-       return ord(rxdata[9])
+       
    
 
    
@@ -496,12 +499,12 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(13)
+           if(ord(rxdata[10])<=127):
+               return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
+           else:
+               return (ord(rxdata[10])-0xFF)*0xFF + (ord(rxdata[9])&0xFF)-0xFF
        except:
            print "Could not read from the servos. Please check the connections"
-       if(ord(rxdata[10])<=127):
-           return ((ord(rxdata[10])&0x03)<<8) | (ord(rxdata[9])&0xFF);
-       else:
-           return (ord(rxdata[10])-0xFF)*0xFF + (ord(rxdata[9])&0xFF)-0xFF
    
    
    
@@ -614,10 +617,10 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(13)
+           return (ord(rxdata[10])*256)+(ord(rxdata[9])&0xff)
        except:
            print "Could not read from the servos. Check connection"
        
-       return (ord(rxdata[10])*256)+(ord(rxdata[9])&0xff)
    
    
    def get_position_i(self):
@@ -636,10 +639,10 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(13)
+           return (ord(rxdata[10])*256)+(ord(rxdata[9])&0xff)
        except:
            print "Could not read from the servos. Check connection"
        
-       return (ord(rxdata[10])*256)+(ord(rxdata[9])&0xff)
    
    
    def get_position_d(self):
@@ -658,10 +661,10 @@ class servo:
        rxdata = []
        try:
            rxdata = serport.read(13)
+           return (ord(rxdata[10])*256)+(ord(rxdata[9])&0xff)
        except:
            print "Could not read from the servos. Check connection"
        
-       return (ord(rxdata[10])*256)+(ord(rxdata[9])&0xff)
    
    
    def save_pid_eeprom(self):
