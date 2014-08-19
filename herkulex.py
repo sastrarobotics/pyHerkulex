@@ -298,7 +298,7 @@ class servo:
 
    def __init__(self,servoid):
        self.servoid = servoid
-<<<<<<< HEAD
+
 
        self.servomodel = self.get_model()
 
@@ -321,9 +321,6 @@ class servo:
        except:
            print "Could not read from the servos. Check connection"
        
-=======
-       self.servomodel = get_model(servoid)
->>>>>>> 8f36b81d48ab79b2abe6ffd9c297e2e758fa8415
       
    def  set_led(self,colorcode):
        """ Set the LED Color of Herkulex
