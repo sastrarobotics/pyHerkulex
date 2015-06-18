@@ -10,4 +10,4 @@
 
   
 ##Usage and Examples
-  Coming soon..!!
+  See the Examples folder
